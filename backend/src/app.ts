@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import logRouter from './routes/log.routes';
+
 const app = express();
 
 app.use(helmet());
@@ -28,6 +30,8 @@ app.use(
 
 app.use(morgan("dev"));
 app.use(express.json({ limit: "10mb" }));
+
+app.use('/api/logs', logRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: "ok" });
