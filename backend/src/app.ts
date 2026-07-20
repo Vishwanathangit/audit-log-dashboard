@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import logRouter from './routes/log.routes';
+import { notFound } from './middlewares/notFound.middleware';
+import { errorHandler } from './middlewares/errorHandler.middleware';
 
 const app = express();
 
@@ -36,5 +38,8 @@ app.use('/api/logs', logRouter);
 app.get('/api/health', (req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;
