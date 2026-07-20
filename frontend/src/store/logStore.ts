@@ -56,10 +56,19 @@ export const useLogStore = create<LogState>((set, get) => ({
 
   setFilters: (newFilters) => {
     // Merges partial filters and resets page to 1
-    set((state) => ({
-      filters: { ...state.filters, ...newFilters },
-      page: 1,
-    }));
+    set((state) => {
+      const merged = { ...state.filters, ...newFilters };
+      // Explicitly delete undefined keys so they are completely removed from the store state
+      Object.keys(merged).forEach((key) => {
+        if (merged[key as keyof LogFiltersState] === undefined) {
+          delete merged[key as keyof LogFiltersState];
+        }
+      });
+      return {
+        filters: merged,
+        page: 1,
+      };
+    });
   },
 
   setPage: (page) => {

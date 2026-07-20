@@ -14,11 +14,13 @@ import DateRangePicker from '../common/DateRangePicker';
 
 export default function LogFilters() {
   // Subscribe strictly to the relevant filter values and setFilters action
+  const search = useLogStore((state) => state.filters.search);
   const severity = useLogStore((state) => state.filters.severity);
   const status = useLogStore((state) => state.filters.status);
   const resourceType = useLogStore((state) => state.filters.resourceType);
   const region = useLogStore((state) => state.filters.region);
   const action = useLogStore((state) => state.filters.action);
+  const actor = useLogStore((state) => state.filters.actor);
   const startDate = useLogStore((state) => state.filters.startDate);
   const endDate = useLogStore((state) => state.filters.endDate);
   const setFilters = useLogStore((state) => state.setFilters);
@@ -32,17 +34,20 @@ export default function LogFilters() {
       resourceType: undefined,
       region: undefined,
       action: undefined,
+      actor: undefined,
       startDate: undefined,
       endDate: undefined,
     });
   };
 
   const hasActiveFilters = 
+    (search !== undefined && search !== '') ||
     severity !== undefined ||
     status !== undefined ||
     resourceType !== undefined ||
     (region !== undefined && region !== '') ||
     (action !== undefined && action !== '') ||
+    (actor !== undefined && actor !== '') ||
     startDate !== undefined ||
     endDate !== undefined;
 

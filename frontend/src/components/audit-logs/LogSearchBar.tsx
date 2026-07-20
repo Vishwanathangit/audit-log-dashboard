@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useLogStore } from '../../store/logStore';
-import { useDebounce } from '../../utils/useDebounce';
 
 export default function LogSearchBar() {
   // Subscribe strictly to only the slices of store required
@@ -11,20 +10,42 @@ export default function LogSearchBar() {
 
   // Local state to keep the input fluid while typing
   const [value, setValue] = React.useState(storeSearch || '');
-  const debouncedValue = useDebounce(value, 400);
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  // Keep local input in sync if store gets cleared (e.g. via 'Clear Filters')
+  // Keep local input in sync if store gets cleared (e.g. via 'Clear Filters' or chips)
   React.useEffect(() => {
-    setValue(storeSearch || '');
+    if (!storeSearch) {
+      setValue('');
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    } else if (storeSearch !== value) {
+      setValue(storeSearch);
+    }
   }, [storeSearch]);
 
   // Push changes to store when debounced value updates
-  React.useEffect(() => {
-    // Only update if it differs from current store value
-    if (debouncedValue !== (storeSearch || '')) {
-      setFilters({ search: debouncedValue || undefined });
+  const handleChange = (newValue: string) => {
+    setValue(newValue);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
-  }, [debouncedValue, storeSearch, setFilters]);
+
+    timeoutRef.current = setTimeout(() => {
+      setFilters({ search: newValue.trim() || undefined });
+    }, 400);
+  };
+
+  // Clean up pending timeouts on component unmount
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative w-full">
@@ -33,7 +54,7 @@ export default function LogSearchBar() {
         type="search"
         placeholder="Search logs (actor, action, resource)..."
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         className="w-full pl-9 bg-background text-foreground"
       />
     </div>
