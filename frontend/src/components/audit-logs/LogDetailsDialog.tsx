@@ -6,62 +6,75 @@ import { formatTimestamp } from '../../utils/formatDate.util';
 
 interface LogDetailsDialogProps {
   log: IAuditLog | null;
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export default function LogDetailsDialog({ log, isOpen, onClose }: LogDetailsDialogProps) {
+export default function LogDetailsDialog({ log, open, onOpenChange }: LogDetailsDialogProps) {
   if (!log) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md bg-popover text-popover-foreground">
         <DialogHeader>
-          <DialogTitle>Audit Log Details</DialogTitle>
-          <DialogDescription>Detailed context for selected log entry.</DialogDescription>
+          <DialogTitle className="text-lg font-bold">Audit Log Details</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Complete details and metadata for this audit trail entry.
+          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-3 py-4 text-sm">
-          <div className="grid grid-cols-3 font-semibold border-b pb-1">
-            <span className="col-span-1 text-muted-foreground">Field</span>
-            <span className="col-span-2 text-foreground">Value</span>
+
+        {/* Clean key-value grid layout */}
+        <div className="grid gap-3 py-4 text-sm max-h-[60vh] overflow-y-auto pr-1">
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Log ID</span>
+            <span className="col-span-2 font-mono text-xs select-all text-foreground break-all">{log._id}</span>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">ID</span>
-            <span className="col-span-2 font-mono break-all text-xs">{log._id}</span>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actor</span>
+            <span className="col-span-2 font-medium text-foreground">{log.actor}</span>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">Actor</span>
-            <span className="col-span-2 font-medium">{log.actor} ({log.role})</span>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Role</span>
+            <span className="col-span-2 text-foreground">{log.role}</span>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">Action</span>
-            <span className="col-span-2">{log.action}</span>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Action</span>
+            <span className="col-span-2 font-mono text-xs text-foreground bg-muted/40 px-1.5 py-0.5 rounded w-fit">{log.action}</span>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">Resource</span>
-            <span className="col-span-2 font-mono text-xs">{log.resource} ({log.resourceType})</span>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Resource</span>
+            <span className="col-span-2 font-mono text-xs text-foreground break-all">{log.resource}</span>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">Severity</span>
-            <span className="col-span-2">
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Resource Type</span>
+            <span className="col-span-2 text-foreground">{log.resourceType}</span>
+          </div>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Severity</span>
+            <div className="col-span-2">
               <SeverityBadge severity={log.severity} />
-            </span>
+            </div>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">Status</span>
-            <span className="col-span-2">
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</span>
+            <div className="col-span-2">
               <StatusBadge status={log.status} />
-            </span>
+            </div>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">IP / Region</span>
-            <span className="col-span-2">{log.ipAddress} ({log.region})</span>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">IP Address</span>
+            <span className="col-span-2 font-mono text-xs text-foreground">{log.ipAddress}</span>
           </div>
-          <div className="grid grid-cols-3">
-            <span className="col-span-1 text-muted-foreground">Timestamp</span>
-            <span className="col-span-2">{formatTimestamp(log.timestamp)}</span>
+          <div className="grid grid-cols-3 items-center border-b border-border/40 pb-2">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Region</span>
+            <span className="col-span-2 text-foreground">{log.region}</span>
+          </div>
+          <div className="grid grid-cols-3 items-center pb-1">
+            <span className="col-span-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Timestamp</span>
+            <span className="col-span-2 text-foreground">{formatTimestamp(log.timestamp)}</span>
           </div>
         </div>
+
         <DialogFooter showCloseButton />
       </DialogContent>
     </Dialog>

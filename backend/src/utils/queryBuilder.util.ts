@@ -58,3 +58,33 @@ export const buildSortObject = (
 ): { [key: string]: 1 | -1 } => {
   return { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 };
+
+export const buildSeverityAggregationPipeline = (
+  filter: any,
+  sortOrder: 'asc' | 'desc' = 'desc',
+  skip: number,
+  limit: number
+): any[] => {
+  const sortOrderVal = sortOrder === 'asc' ? 1 : -1;
+  return [
+    { $match: filter },
+    {
+      $addFields: {
+        severityRank: {
+          $switch: {
+            branches: [
+              { case: { $eq: ['$severity', 'LOW'] }, then: 1 },
+              { case: { $eq: ['$severity', 'MEDIUM'] }, then: 2 },
+              { case: { $eq: ['$severity', 'HIGH'] }, then: 3 },
+              { case: { $eq: ['$severity', 'CRITICAL'] }, then: 4 }
+            ],
+            default: 0
+          }
+        }
+      }
+    },
+    { $sort: { severityRank: sortOrderVal } },
+    { $skip: skip },
+    { $limit: limit }
+  ];
+};

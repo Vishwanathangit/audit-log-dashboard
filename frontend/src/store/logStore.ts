@@ -60,23 +60,19 @@ export const useLogStore = create<LogState>((set, get) => ({
       filters: { ...state.filters, ...newFilters },
       page: 1,
     }));
-    get().fetchLogs();
   },
 
   setPage: (page) => {
     set({ page });
-    get().fetchLogs();
   },
 
   setLimit: (limit) => {
     // Changing page size resets to page 1
     set({ limit, page: 1 });
-    get().fetchLogs();
   },
 
   setSort: (sortBy, sortOrder) => {
     set({ sortBy, sortOrder });
-    get().fetchLogs();
   },
 
   fetchLogs: async () => {
