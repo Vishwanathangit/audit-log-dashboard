@@ -7,22 +7,20 @@
     "backend": {
       "root": "backend",
       "entrypoint": "api/index.ts",
-      "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
-      "buildCommand": "cd ../.. && pnpm --filter backend run build"
+      "installCommand": "pnpm install --frozen-lockfile",
+      "buildCommand": "pnpm run build"
     }
   },
   "rewrites": [
     {
       "source": "/api(/.*)?",
       "destination": {
-        "type": "service",
         "service": "backend"
       }
     },
     {
       "source": "/(.*)",
       "destination": {
-        "type": "service",
         "service": "frontend"
       }
     }
