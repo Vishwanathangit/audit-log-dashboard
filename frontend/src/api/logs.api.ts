@@ -12,7 +12,7 @@ export async function fetchLogs(
   params: LogQueryParams,
   signal?: AbortSignal
 ): Promise<LogsApiResponse> {
-  const response = await api.get<LogsApiResponse>('/api/logs', { params, signal });
+  const response = await api.get<LogsApiResponse>('/logs', { params, signal });
   return response.data;
 }
 
@@ -20,7 +20,7 @@ export async function bulkUploadLogs(
   logs: (Omit<IAuditLog, '_id'> | IAuditLog[])[]
 ): Promise<{ success: boolean; count: number; message: string }> {
   const response = await api.post<{ success: boolean; count: number; message: string }>(
-    '/api/logs/bulk-upload',
+    '/logs/bulk-upload',
     { logs }
   );
   return response.data;

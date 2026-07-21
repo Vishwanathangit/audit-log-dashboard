@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
+    "build": "tsc && node -e \"require('fs').writeFileSync('dist/server.js', 'require(\\\"./src/server.js\\\");\\n')\"",
     "start": "node dist/server.js",
     "generate:csv": "node scripts/generate-test-logs.js"
   },
@@ -34,6 +34,7 @@
     "@types/express": "^5.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^26.1.1",
+    "@vercel/node": "^5.8.26",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"
   }
