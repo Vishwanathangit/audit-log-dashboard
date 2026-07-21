@@ -8,8 +8,11 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export async function fetchLogs(params: LogQueryParams): Promise<LogsApiResponse> {
-  const response = await api.get<LogsApiResponse>('/api/logs', { params });
+export async function fetchLogs(
+  params: LogQueryParams,
+  signal?: AbortSignal
+): Promise<LogsApiResponse> {
+  const response = await api.get<LogsApiResponse>('/api/logs', { params, signal });
   return response.data;
 }
 

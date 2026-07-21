@@ -21,37 +21,34 @@ export default function DashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const isInitialized = useRef(false);
 
-  // Sync initial URL query string params into Zustand store on mount
   useEffect(() => {
-    const urlPage = searchParams.get('page');
-    const urlLimit = searchParams.get('limit');
-    const urlSortBy = searchParams.get('sortBy');
-    const urlSortOrder = searchParams.get('sortOrder');
+    if (!isInitialized.current) {
+      const urlPage = searchParams.get('page');
+      const urlLimit = searchParams.get('limit');
+      const urlSortBy = searchParams.get('sortBy');
+      const urlSortOrder = searchParams.get('sortOrder');
 
-    const urlFilters: any = {};
-    const filterKeys = ['search', 'severity', 'status', 'resourceType', 'region', 'action', 'actor', 'startDate', 'endDate'];
-    filterKeys.forEach((key) => {
-      const val = searchParams.get(key);
-      if (val) {
-        urlFilters[key] = val;
-      }
-    });
+      const urlFilters: any = {};
+      const filterKeys = ['search', 'severity', 'status', 'resourceType', 'region', 'action', 'actor', 'startDate', 'endDate'];
+      filterKeys.forEach((key) => {
+        const val = searchParams.get(key);
+        if (val) {
+          urlFilters[key] = val;
+        }
+      });
 
-    // Populate Zustand store values directly in one batch
-    useLogStore.setState({
-      page: urlPage ? Number(urlPage) : 1,
-      limit: urlLimit ? Number(urlLimit) : 20,
-      sortBy: urlSortBy || 'timestamp',
-      sortOrder: (urlSortOrder as any) || 'desc',
-      filters: urlFilters,
-    });
+      useLogStore.setState({
+        page: urlPage ? Number(urlPage) : 1,
+        limit: urlLimit ? Number(urlLimit) : 20,
+        sortBy: urlSortBy || 'timestamp',
+        sortOrder: (urlSortOrder as any) || 'desc',
+        filters: urlFilters,
+      });
 
-    isInitialized.current = true;
-  }, []);
+      isInitialized.current = true;
+      return;
+    }
 
-  // Sync Zustand store updates back to URL search params and trigger data fetches
-  useEffect(() => {
-    if (!isInitialized.current) return;
 
     const params = new URLSearchParams();
 

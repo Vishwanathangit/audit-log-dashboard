@@ -1,7 +1,10 @@
 import { create } from 'zustand';
+import axios from 'axios';
 import type { IAuditLog, LogQueryParams } from '../types/log.types';
 import { fetchLogs as fetchLogsApi } from '../api/logs.api';
 import { DEFAULT_PAGE_SIZE } from '../constants/log.constants';
+
+let activeAbortController: AbortController | null = null;
 
 // We separate filter properties from pagination and sorting to make state merging simpler
 export interface LogFiltersState {
@@ -85,6 +88,13 @@ export const useLogStore = create<LogState>((set, get) => ({
   },
 
   fetchLogs: async () => {
+
+    if (activeAbortController) {
+      activeAbortController.abort();
+    }
+    activeAbortController = new AbortController();
+    const signal = activeAbortController.signal;
+
     set({ isLoading: true, error: null });
     try {
       const { page, limit, sortBy, sortOrder, filters } = get();
@@ -98,7 +108,10 @@ export const useLogStore = create<LogState>((set, get) => ({
         ...filters,
       };
 
-      const data = await fetchLogsApi(params);
+      const data = await fetchLogsApi(params, signal);
+      
+      if (signal.aborted) return;
+
       set({
         logs: data.logs,
         total: data.total,
@@ -107,10 +120,17 @@ export const useLogStore = create<LogState>((set, get) => ({
         error: null,
       });
     } catch (err: any) {
+      if (axios.isCancel(err) || err.name === 'CanceledError') {
+        return;
+      }
       set({
         isLoading: false,
         error: err.response?.data?.message || err.message || 'An error occurred while fetching audit logs.',
       });
+    } finally {
+      if (activeAbortController?.signal === signal) {
+        activeAbortController = null;
+      }
     }
   },
 }));
