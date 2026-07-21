@@ -2,7 +2,7 @@
 
 A full-stack security audit log management system where security engineers can bulk upload, view, filter, search, sort, and investigate system audit logs â€” with all filtering, searching, sorting, and pagination logic handled entirely on the server for performance at scale.
 
-**Live Link:** _[Add your deployed Vercel frontend URL here after deployment]_
+**Live Link:** [https://audit-log-dashboard-omega.vercel.app](https://audit-log-dashboard-omega.vercel.app)
 
 ---
 
@@ -341,21 +341,22 @@ This project is deployed as a **single Vercel project using Vercel Services** â€
       "framework": "vite"
     },
     "backend": {
-      "root": "backend"
+      "root": "backend",
+      "entrypoint": "api/index.ts",
+      "installCommand": "pnpm install --frozen-lockfile",
+      "buildCommand": "pnpm run build"
     }
   },
   "rewrites": [
     {
       "source": "/api(/.*)?",
       "destination": {
-        "type": "service",
         "service": "backend"
       }
     },
     {
       "source": "/(.*)",
       "destination": {
-        "type": "service",
         "service": "frontend"
       }
     }
